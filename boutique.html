@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Menu – Tala Menu</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1A3B5C">
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="brand">
+                <span class="logo-icon">📋</span>
+                <span class="site-title">Tala Menu</span>
+            </div>
+        </div>
+    </header>
+
+    <main id="boutique-main">
+        <div id="boutique-loader" class="loader"></div>
+
+        <div id="boutique-contenu" class="hidden">
+            <div id="expiration-banner"></div>
+
+            <section class="boutique-header">
+                <div class="boutique-image">📋</div>
+                <h1 id="boutique-nom">...</h1>
+                <p id="boutique-adresse">...</p>
+            </section>
+
+            <section class="section-box">
+                <h2 style="text-align:center;">📋 Menu du jour</h2>
+                <div id="produits-liste">
+                    <p style="text-align:center; color: var(--text-muted);">Chargement des produits...</p>
+                </div>
+            </section>
+
+            <section class="whatsapp-action text-center mt-24">
+                <button id="btn-commander" class="btn-primary" style="background: #25D366; box-shadow: 0 6px 24px rgba(37,211,102,0.40);">
+                    📞 Commander sur WhatsApp
+                </button>
+            </section>
+
+            <p style="text-align:center; color: var(--text-muted); font-size: 0.85rem; margin-top: 22px;">
+                📅 Menu valable jusqu'au : <strong id="date-expiration">...</strong>
+            </p>
+            <p style="text-align:center; font-size: 0.78rem; color: var(--text-muted); margin-top: 14px;">
+                Propulsé par <strong>Tala Menu</strong> – Lubumbashi
+            </p>
+        </div>
+
+        <div id="boutique-introuvable" class="hidden page-404">
+            <div class="error-code">📋</div>
+            <h2>Boutique introuvable</h2>
+            <p>Ce QR code ne correspond à aucune boutique ou le menu a expiré.</p>
+            <a href="index.html" class="btn-primary" style="margin-top:16px;">🏠 Accueil</a>
+        </div>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+    <script>
+        firebase.initializeApp({
+            apiKey: CONFIG.FIREBASE_API_KEY,
+            projectId: CONFIG.FIREBASE_PROJECT_ID,
+            appId: CONFIG.FIREBASE_APP_ID
+        });
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', function() { chargerBoutique(); });
+
+        async function chargerBoutique() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const boutiqueId = urlParams.get('id');
+            const loader = document.getElementById('boutique-loader');
+            const contenu = document.getElementById('boutique-contenu');
+            const introuvable = document.getElementById('boutique-introuvable');
+
+            if (!boutiqueId) { loader.classList.add('loader-hidden'); introuvable.classList.remove('hidden'); return; }
+
+            const snapshot = await db.collection('users').where('whatsapp', '==', boutiqueId).get();
+            var boutique = null;
+            if (!snapshot.empty) {
+                boutique = snapshot.docs[0].data();
+            } else {
+                const snapshot2 = await db.collection('users').where('codeSecret', '==', boutiqueId).get();
+                if (!snapshot2.empty) {
+                    boutique = snapshot2.docs[0].data();
+                }
+            }
+
+            if (!boutique) { loader.classList.add('loader-hidden'); introuvable.classList.remove('hidden'); return; }
+
+            loader.classList.add('loader-hidden');
+            contenu.classList.remove('hidden');
+
+            document.getElementById('boutique-nom').textContent = boutique.boutique;
+            document.getElementById('boutique-adresse').textContent = '📍 ' + (boutique.adresse || 'Adresse non précisée');
+            document.getElementById('date-expiration').textContent = boutique.dateExpiration || 'N/A';
+
+            const produitsContainer = document.getElementById('produits-liste');
+            const qrParam = urlParams.get('qr');
+            var produits = [];
+            if (qrParam && boutique.qrCodes) {
+                const qrTrouve = boutique.qrCodes.find(q => q.id === qrParam);
+                if (qrTrouve) produits = qrTrouve.produits || [];
+            }
+            if (produits.length === 0 && boutique.qrCodes && boutique.qrCodes.length > 0) {
+                produits = boutique.qrCodes[0].produits || [];
+            }
+
+            if (produits.length === 0) {
+                produitsContainer.innerHTML = '<p style="text-align:center;color:var(--text-muted);">Aucun produit pour le moment.</p>';
+            } else {
+                produitsContainer.innerHTML = '';
+                produits.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'produit-item';
+                    div.innerHTML = '<span class="produit-nom">' + p.nom + '</span><span class="produit-prix">' + p.prix + '</span>';
+                    produitsContainer.appendChild(div);
+                });
+            }
+
+            const btnCommander = document.getElementById('btn-commander');
+            if (btnCommander && boutique.whatsapp) {
+                btnCommander.addEventListener('click', function() {
+                    const phone = boutique.whatsapp.replace(/[^0-9]/g, '');
+                    window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(MESSAGES.COMMANDE_CLIENT(boutique.boutique)), '_blank');
+                });
+            }
+            verifierExpiration(boutique.dateExpiration);
+        }
+
+        function verifierExpiration(dateExpiration) {
+            const banner = document.getElementById('expiration-banner');
+            if (!banner || !dateExpiration) return;
+            const maintenant = new Date();
+            const expiration = new Date(dateExpiration);
+            const diffJours = Math.ceil((expiration - maintenant) / (1000 * 60 * 60 * 24));
+            if (diffJours <= 0) {
+                banner.style.display = 'block'; banner.className = 'alert alert-error';
+                banner.textContent = '⚠️ Ce menu a expiré. Contactez le commerçant.';
+            } else if (diffJours <= 2) {
+                banner.style.display = 'block'; banner.className = 'alert alert-warning';
+                banner.textContent = '🔔 Ce menu expire dans ' + diffJours + ' jour' + (diffJours > 1 ? 's' : '') + '.';
+            } else { banner.style.display = 'none'; }
+        }
+    </script>
+</body>
+</html>

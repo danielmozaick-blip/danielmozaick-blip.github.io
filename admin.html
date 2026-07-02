@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Admin – Tala Menu</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1A3B5C">
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="brand">
+                <span class="logo-icon">📋</span>
+                <span class="site-title">Tala Menu – Admin</span>
+            </div>
+            <button id="theme-toggle" class="btn-icon" aria-label="Mode sombre">🌙</button>
+        </div>
+    </header>
+
+    <main>
+
+        <section id="admin-login" class="section-box">
+            <h1 style="text-align:center;">🔐 Connexion administrateur</h1>
+            <p style="text-align:center; color: var(--text-muted); margin-bottom: 24px;">Accès réservé – Tala Menu Lubumbashi.</p>
+            <form id="admin-login-form" class="form-container">
+                <div class="form-group">
+                    <label for="admin-email">Email *</label>
+                    <input type="email" id="admin-email" placeholder="Votre email admin" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Mot de passe *</label>
+                    <input type="password" id="admin-password" placeholder="Votre mot de passe" required>
+                </div>
+                <div class="form-group text-center mt-24">
+                    <button type="submit" class="btn-primary">🔓 Se connecter</button>
+                </div>
+            </form>
+            <div id="admin-login-error" class="alert alert-error hidden text-center"></div>
+        </section>
+
+        <div id="admin-dashboard" class="hidden">
+
+            <h1 style="text-align:center;">📊 Tableau de bord</h1>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 14px; margin-bottom: 28px;">
+                <div class="card text-center">
+                    <strong style="font-size: 1.8rem; color: var(--primary);" id="admin-total">0</strong><br>
+                    <span style="font-size: 0.80rem; color: var(--text-muted);">Total inscrits</span>
+                </div>
+                <div class="card text-center">
+                    <strong style="font-size: 1.8rem; color: #27AE60;" id="admin-gratuit">0</strong><br>
+                    <span style="font-size: 0.80rem; color: var(--text-muted);">Gratuits</span>
+                </div>
+                <div class="card text-center">
+                    <strong style="font-size: 1.8rem; color: var(--gold);" id="admin-standard">0</strong><br>
+                    <span style="font-size: 0.80rem; color: var(--text-muted);">Standard</span>
+                </div>
+                <div class="card text-center">
+                    <strong style="font-size: 1.8rem; color: #39CCCC;" id="admin-premium-plus">0</strong><br>
+                    <span style="font-size: 0.80rem; color: var(--text-muted);">Premium+</span>
+                </div>
+                <div class="card text-center">
+                    <strong style="font-size: 1.8rem; color: #E74C3C;" id="admin-expire">0</strong><br>
+                    <span style="font-size: 0.80rem; color: var(--text-muted);">Expirés</span>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <h2>📋 Commerçants</h2>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table" id="table-commercants">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Boutique</th>
+                                <th>WhatsApp</th>
+                                <th>Code</th>
+                                <th>Offre</th>
+                                <th>QR</th>
+                                <th>Jours</th>
+                                <th>Expire le</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-commercants">
+                            <tr><td colspan="9" style="text-align:center;">Chargement...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <h2>⭐ Avis en attente <span id="notif-avis" class="notif-badge hidden">0</span></h2>
+                <div id="avis-attente-liste"><p style="color: var(--text-muted);">Aucun avis en attente.</p></div>
+            </div>
+
+            <div class="section-box">
+                <h2>💰 Paiements en attente <span id="notif-paiements" class="notif-badge hidden">0</span></h2>
+                <div id="paiements-attente-liste"><p style="color: var(--text-muted);">Aucun paiement en attente.</p></div>
+            </div>
+
+            <div class="section-box">
+                <h2>🔒 Commentaires privés</h2>
+                <div id="commentaires-liste"><p style="color: var(--text-muted);">Aucun commentaire.</p></div>
+            </div>
+
+            <div class="section-box">
+                <h2>📩 Messages de contact</h2>
+                <div id="messages-contact-liste"><p style="color: var(--text-muted);">Aucun message.</p></div>
+            </div>
+
+            <div class="section-box">
+                <h2>🔑 Réinitialiser un code secret</h2>
+                <form id="reset-code-form" class="form-container">
+                    <div class="form-group">
+                        <label for="reset-whatsapp">WhatsApp du commerçant</label>
+                        <input type="text" id="reset-whatsapp" placeholder="Ex : 0993636691" required>
+                    </div>
+                    <div class="form-group text-center">
+                        <button type="submit" class="btn-secondary">🔄 Réinitialiser</button>
+                    </div>
+                </form>
+                <div id="reset-success" class="alert alert-success hidden text-center mt-16">✅ Code réinitialisé.</div>
+            </div>
+
+            <div class="text-center mt-24 mb-16">
+                <button id="btn-admin-logout" class="btn-danger">🚪 Déconnexion</button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-auth-compat.js"></script>
+    
+    <script>
+        // Initialisation Firebase
+        firebase.initializeApp({
+            apiKey: CONFIG.FIREBASE_API_KEY,
+            projectId: CONFIG.FIREBASE_PROJECT_ID,
+            appId: CONFIG.FIREBASE_APP_ID
+        });
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Vérification connexion Firestore
+        db.collection('users').limit(1).get()
+            .then(function() {
+                var badge = document.createElement('div');
+                badge.style.cssText = 'position:fixed;bottom:10px;left:10px;background:#27AE60;color:#fff;padding:6px 12px;border-radius:20px;font-size:0.75rem;z-index:9999;';
+                badge.textContent = '✅ Firestore OK';
+                document.body.appendChild(badge);
+                setTimeout(function() { badge.remove(); }, 3000);
+            })
+            .catch(function() {
+                var badge = document.createElement('div');
+                badge.style.cssText = 'position:fixed;bottom:10px;left:10px;background:#E74C3C;color:#fff;padding:6px 12px;border-radius:20px;font-size:0.75rem;z-index:9999;';
+                badge.textContent = '❌ Firestore HS';
+                document.body.appendChild(badge);
+            });
+
+        // Authentification
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                chargerToutesLesDonnees();
+            } else {
+                document.getElementById('admin-login').classList.remove('hidden');
+                document.getElementById('admin-dashboard').classList.add('hidden');
+            }
+        });
+
+        // Theme
+        (function() {
+            var themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                var saved = localStorage.getItem('tala-theme');
+                if (saved === 'dark') { document.body.classList.add('dark-mode'); themeToggle.textContent = '☀️'; }
+                themeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+                    var isDark = document.body.classList.contains('dark-mode');
+                    themeToggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('tala-theme', isDark ? 'dark' : 'light');
+                });
+            }
+        })();
+
+        // Login
+        var loginForm = document.getElementById('admin-login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var email = document.getElementById('admin-email').value.trim();
+                var password = document.getElementById('admin-password').value.trim();
+                var errorDiv = document.getElementById('admin-login-error');
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(function() { errorDiv.classList.add('hidden'); })
+                    .catch(function(error) { errorDiv.textContent = '❌ ' + error.message; errorDiv.classList.remove('hidden'); });
+            });
+        }
+
+        // Logout
+        var btnLogout = document.getElementById('btn-admin-logout');
+        if (btnLogout) {
+            btnLogout.addEventListener('click', function() {
+                if (confirm('Déconnexion ?')) { auth.signOut(); }
+            });
+        }
+
+        function chargerToutesLesDonnees() {
+            chargerCommercants();
+            chargerAvisEnAttente();
+            chargerPaiementsEnAttente();
+            chargerCommentaires();
+            chargerMessagesContact();
+            initResetCode();
+        }
+
+        function calculerJoursRestants(dateExpiration) {
+            if (!dateExpiration) return 0;
+            var maintenant = new Date();
+            var expiration = new Date(dateExpiration);
+            var diff = Math.ceil((expiration - maintenant) / (1000 * 60 * 60 * 24));
+            return diff > 0 ? diff : 0;
+        }
+
+        function chargerCommercants() {
+            db.collection('users').get().then(function(snapshot) {
+                var allUsers = [];
+                snapshot.forEach(function(doc) { allUsers.push(doc.data()); });
+                document.getElementById('admin-total').textContent = allUsers.length;
+                document.getElementById('admin-gratuit').textContent = allUsers.filter(function(u) { return u.statut === 'gratuit'; }).length;
+                document.getElementById('admin-standard').textContent = allUsers.filter(function(u) { return u.statut === 'premium'; }).length;
+                document.getElementById('admin-premium-plus').textContent = allUsers.filter(function(u) { return u.statut === 'premium_plus'; }).length;
+                document.getElementById('admin-expire').textContent = allUsers.filter(function(u) { return u.statut === 'expire'; }).length;
+
+                var tbody = document.getElementById('tbody-commercants');
+                if (!tbody) return;
+                if (allUsers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Aucun commerçant.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = '';
+                allUsers.forEach(function(user) {
+                    var tr = document.createElement('tr');
+                    var statutClass = user.statut === 'premium_plus' ? 'statut-premium-plus' : user.statut === 'premium' ? 'statut-premium' : user.statut === 'expire' ? 'statut-expire' : 'statut-gratuit';
+                    var statutText = user.statut === 'premium_plus' ? '💎 Premium+' : user.statut === 'premium' ? '🌟 Standard' : user.statut === 'expire' ? '⏳ Expiré' : '✅ Gratuit';
+                    var nbQR = user.qrCodes ? user.qrCodes.length : 0;
+                    var maxQR = (user.statut === 'premium' || user.statut === 'premium_plus') ? '∞' : CONFIG.MAX_QR_GRATUIT;
+                    var joursRestants = calculerJoursRestants(user.dateExpiration);
+                    tr.innerHTML = '<td>' + user.prenom + ' ' + user.nom + '</td><td>' + user.boutique + '</td><td>' + user.whatsapp + '</td><td><strong>' + user.codeSecret + '</strong></td><td><span class="statut-badge ' + statutClass + '">' + statutText + '</span></td><td>' + nbQR + ' / ' + maxQR + '</td><td>' + joursRestants + ' j</td><td>' + (user.dateExpiration || 'N/A') + '</td><td style="display:flex;gap:4px;flex-wrap:wrap;"><button class="btn-success btn-sm" onclick="window.passerPremium(\'' + user.whatsapp + '\',\'' + user.boutique + '\')">🔄</button><button class="btn-secondary btn-sm" onclick="window.offrirBonus(\'' + user.whatsapp + '\',\'' + user.boutique + '\')">🎁</button><button class="btn-secondary btn-sm" onclick="window.gererQRAdmin(\'' + user.whatsapp + '\',\'' + user.boutique + '\')">📷</button><button class="btn-secondary btn-sm" onclick="window.envoyerWhatsApp(\'' + user.whatsapp + '\',\'' + user.prenom + '\',\'' + joursRestants + '\',\'' + (user.dateExpiration || '') + '\',\'' + statutText + '\')">💬</button><button class="btn-danger btn-sm" onclick="window.supprimerCommercant(\'' + user.whatsapp + '\',\'' + user.boutique + '\')">🗑️</button></td>';
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        window.passerPremium = function(whatsapp, boutique) {
+            if (!confirm('Passer en premium Standard (5 $) pour 30 jours ?')) return;
+            var docId = whatsapp + '_' + boutique;
+            var newDate = new Date();
+            newDate.setDate(newDate.getDate() + CONFIG.DUREE_STANDARD_JOURS);
+            db.collection('users').doc(docId).update({ dateExpiration: newDate.toISOString().split('T')[0], statut: 'premium' })
+                .then(function() { chargerCommercants(); alert('✅ Passé en premium Standard.'); });
+        };
+
+        window.offrirBonus = function(whatsapp, boutique) {
+            var jours = prompt('🎁 Jours à offrir ?', '7');
+            if (!jours || isNaN(jours) || parseInt(jours) <= 0) return;
+            var docId = whatsapp + '_' + boutique;
+            db.collection('users').doc(docId).get().then(function(doc) {
+                if (doc.exists) {
+                    var data = doc.data();
+                    var currentDate = data.dateExpiration ? new Date(data.dateExpiration) : new Date();
+                    currentDate.setDate(currentDate.getDate() + parseInt(jours));
+                    var update = { dateExpiration: currentDate.toISOString().split('T')[0] };
+                    if (data.statut === 'expire') update.statut = 'gratuit';
+                    db.collection('users').doc(docId).update(update).then(function() { chargerCommercants(); alert('✅ ' + jours + ' jours offerts !'); });
+                }
+            });
+        };
+
+        window.gererQRAdmin = function(whatsapp, boutique) {
+            var docId = whatsapp + '_' + boutique;
+            db.collection('users').doc(docId).get().then(function(doc) {
+                if (!doc.exists) { alert('Utilisateur introuvable.'); return; }
+                var user = doc.data();
+                var qrCodes = user.qrCodes || [];
+                if (qrCodes.length === 0) { alert('Aucun QR.'); return; }
+                var liste = '📷 QR de ' + user.prenom + '\n\n';
+                qrCodes.forEach(function(qr, i) { liste += (i+1) + '. ' + qr.nom + ' - ' + qr.dateCreation + '\n'; });
+                liste += '\nNuméro à supprimer (0=annuler) :';
+                var choix = prompt(liste, '0');
+                if (!choix || choix === '0' || isNaN(choix)) return;
+                var idx = parseInt(choix) - 1;
+                if (idx >= 0 && idx < qrCodes.length) {
+                    if (confirm('Supprimer « ' + qrCodes[idx].nom + ' » ?')) {
+                        qrCodes.splice(idx, 1);
+                        db.collection('users').doc(docId).update({ qrCodes: qrCodes, nbQR: qrCodes.length }).then(function() { chargerCommercants(); alert('✅ QR supprimé.'); });
+                    }
+                }
+            });
+        };
+
+        window.envoyerWhatsApp = function(whatsapp, prenom, joursRestants, dateExp, statut) {
+            var msg = MESSAGES.RAPPEL_EXPIRATION(prenom, joursRestants, dateExp, statut);
+            window.open('https://wa.me/' + whatsapp.replace(/[^0-9]/g,'') + '?text=' + encodeURIComponent(msg), '_blank');
+        };
+
+        window.supprimerCommercant = function(whatsapp, boutique) {
+            if (!confirm('Supprimer définitivement ?')) return;
+            db.collection('users').doc(whatsapp + '_' + boutique).delete().then(function() { chargerCommercants(); alert('🗑️ Supprimé.'); });
+        };
+
+        // --- AVIS EN ATTENTE ---
+        function chargerAvisEnAttente() {
+            db.collection('avisAttente').get().then(function(snapshot) {
+                var avis = [];
+                snapshot.forEach(function(doc) { avis.push({ id: doc.id, data: doc.data() }); });
+                var container = document.getElementById('avis-attente-liste');
+                var notif = document.getElementById('notif-avis');
+                if (notif) { notif.textContent = avis.length; notif.classList.toggle('hidden', avis.length === 0); }
+                if (!container) return;
+                if (avis.length === 0) { container.innerHTML = '<p style="color:var(--text-muted);">Aucun avis en attente.</p>'; return; }
+                container.innerHTML = '';
+                avis.forEach(function(a) {
+                    var div = document.createElement('div');
+                    div.className = 'card mb-8';
+                    div.innerHTML = '<p><strong>' + a.data.prenom + '</strong> – ' + new Date(a.data.date).toLocaleDateString() + '</p><p style="font-style:italic;">"' + a.data.message + '"</p><button class="btn-success btn-sm" onclick="publierAvis(\'' + a.id + '\')">✅ Publier</button> <button class="btn-danger btn-sm" onclick="refuserAvis(\'' + a.id + '\')">❌ Refuser</button>';
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        function publierAvis(id) {
+            db.collection('avisAttente').doc(id).get().then(function(doc) {
+                if (doc.exists) {
+                    var data = doc.data();
+                    db.collection('avisPublies').add(data).then(function() {
+                        db.collection('avisAttente').doc(id).delete().then(function() {
+                            chargerAvisEnAttente();
+                            alert('✅ Avis publié.');
+                        });
+                    });
+                }
+            });
+        }
+
+        function refuserAvis(id) {
+            if (!confirm('Refuser cet avis ?')) return;
+            db.collection('avisAttente').doc(id).delete().then(function() {
+                chargerAvisEnAttente();
+                alert('❌ Avis refusé.');
+            });
+        }
+
+        // --- PAIEMENTS EN ATTENTE ---
+        function chargerPaiementsEnAttente() {
+            db.collection('paiements').where('valide', '==', false).get().then(function(snapshot) {
+                var paiements = [];
+                snapshot.forEach(function(doc) { paiements.push({ id: doc.id, data: doc.data() }); });
+                var container = document.getElementById('paiements-attente-liste');
+                var notif = document.getElementById('notif-paiements');
+                if (notif) { notif.textContent = paiements.length; notif.classList.toggle('hidden', paiements.length === 0); }
+                if (!container) return;
+                if (paiements.length === 0) { container.innerHTML = '<p style="color:var(--text-muted);">Aucun paiement en attente.</p>'; return; }
+                container.innerHTML = '';
+                paiements.forEach(function(p) {
+                    var div = document.createElement('div');
+                    div.className = 'card mb-8';
+                    div.innerHTML = '<p><strong>' + p.data.prenom + ' ' + p.data.nom + '</strong> – ' + p.data.boutique + '</p><p>🏷️ ' + p.data.codeTransaction + ' | 📦 ' + (p.data.offre === 'premium_plus' ? 'Premium+' : 'Standard') + '</p><p>📅 ' + new Date(p.data.date).toLocaleDateString() + '</p><button class="btn-success btn-sm" onclick="validerPaiement(\'' + p.id + '\')">✅ Valider</button> <button class="btn-danger btn-sm" onclick="refuserPaiement(\'' + p.id + '\')">❌ Refuser</button>';
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        function validerPaiement(id) {
+            db.collection('paiements').doc(id).get().then(function(doc) {
+                if (doc.exists) {
+                    var p = doc.data();
+                    db.collection('paiements').doc(id).update({ valide: true });
+                    var docId = p.userWhatsapp + '_' + p.boutique;
+                    var newDate = new Date();
+                    var duree = p.offre === 'premium_plus' ? CONFIG.DUREE_PREMIUM_PLUS_JOURS : CONFIG.DUREE_STANDARD_JOURS;
+                    newDate.setDate(newDate.getDate() + duree);
+                    var newStatut = p.offre === 'premium_plus' ? 'premium_plus' : 'premium';
+                    db.collection('users').doc(docId).update({ dateExpiration: newDate.toISOString().split('T')[0], statut: newStatut }).then(function() {
+                        chargerPaiementsEnAttente();
+                        chargerCommercants();
+                        alert('✅ Paiement validé.');
+                    });
+                }
+            });
+        }
+
+        function refuserPaiement(id) {
+            if (!confirm('Refuser ce paiement ?')) return;
+            db.collection('paiements').doc(id).delete().then(function() {
+                chargerPaiementsEnAttente();
+                alert('❌ Paiement refusé.');
+            });
+        }
+
+        // --- COMMENTAIRES PRIVÉS ---
+        function chargerCommentaires() {
+            db.collection('commentairesPrives').get().then(function(snapshot) {
+                var commentaires = [];
+                snapshot.forEach(function(doc) { commentaires.push({ id: doc.id, data: doc.data() }); });
+                var container = document.getElementById('commentaires-liste');
+                if (!container) return;
+                if (commentaires.length === 0) { container.innerHTML = '<p style="color:var(--text-muted);">Aucun commentaire.</p>'; return; }
+                container.innerHTML = '';
+                commentaires.forEach(function(c) {
+                    var div = document.createElement('div');
+                    div.className = 'card mb-8';
+                    div.innerHTML = '<p><strong>' + c.data.prenom + '</strong> – ' + new Date(c.data.date).toLocaleDateString() + '</p><p>' + c.data.message + '</p><button class="btn-danger btn-sm" onclick="supprimerCommentaire(\'' + c.id + '\')">🗑️</button>';
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        function supprimerCommentaire(id) {
+            if (!confirm('Supprimer ce commentaire ?')) return;
+            db.collection('commentairesPrives').doc(id).delete().then(function() { chargerCommentaires(); });
+        }
+
+        // --- MESSAGES CONTACT ---
+        function chargerMessagesContact() {
+            db.collection('messagesContact').get().then(function(snapshot) {
+                var messages = [];
+                snapshot.forEach(function(doc) { messages.push({ id: doc.id, data: doc.data() }); });
+                var container = document.getElementById('messages-contact-liste');
+                if (!container) return;
+                if (messages.length === 0) { container.innerHTML = '<p style="color:var(--text-muted);">Aucun message.</p>'; return; }
+                container.innerHTML = '';
+                messages.forEach(function(m) {
+                    var div = document.createElement('div');
+                    div.className = 'card mb-8';
+                    div.innerHTML = '<p><strong>' + m.data.nom + '</strong> ' + (m.data.email || '') + '</p><p>' + m.data.message + '</p><button class="btn-danger btn-sm" onclick="supprimerMessage(\'' + m.id + '\')">🗑️</button>';
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        function supprimerMessage(id) {
+            if (!confirm('Supprimer ce message ?')) return;
+            db.collection('messagesContact').doc(id).delete().then(function() { chargerMessagesContact(); });
+        }
+
+        // --- RÉINITIALISER CODE ---
+        function initResetCode() {
+            var form = document.getElementById('reset-code-form');
+            if (!form) return;
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var whatsapp = document.getElementById('reset-whatsapp').value.trim();
+                db.collection('users').where('whatsapp', '==', whatsapp).get().then(function(snapshot) {
+                    if (snapshot.empty) { alert('❌ Aucun commerçant trouvé.'); return; }
+                    var doc = snapshot.docs[0];
+                    var nc = Math.floor(100000 + Math.random() * 900000).toString();
+                    db.collection('users').doc(doc.id).update({ codeSecret: nc }).then(function() {
+                        document.getElementById('reset-success').classList.remove('hidden');
+                        document.getElementById('reset-whatsapp').value = '';
+                        alert('✅ Nouveau code : ' + nc);
+                        setTimeout(function() { document.getElementById('reset-success').classList.add('hidden'); }, 4000);
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>
